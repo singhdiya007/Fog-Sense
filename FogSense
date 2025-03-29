@@ -1,0 +1,74 @@
+// Define pins
+#define trigPin 9
+#define echoPin 10
+#define buzzer 7
+#define greenLED 3
+#define yellowLED 4
+#define redLED 5
+
+#include <LiquidCrystal.h>
+LiquidCrystal lcd(8, 6, 11, 12, 13, 2); // RS, E, D4, D5, D6, D7
+
+void setup() {
+    pinMode(trigPin, OUTPUT);
+    pinMode(echoPin, INPUT);
+    pinMode(buzzer, OUTPUT);
+    pinMode(greenLED, OUTPUT);
+    pinMode(yellowLED, OUTPUT);
+    pinMode(redLED, OUTPUT);
+  
+    lcd.begin(16, 2);
+    lcd.print("Fog Detection");
+    delay(2000);
+}
+
+void loop() {
+    long duration;
+    int distance;
+
+    // Send ultrasonic signal
+    digitalWrite(trigPin, LOW);
+    delayMicroseconds(2);
+    digitalWrite(trigPin, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trigPin, LOW);
+
+    // Receive echo signal
+    duration = pulseIn(echoPin, HIGH);
+    distance = duration * 0.034 / 2;  // Convert time to distance in cm
+
+    // Display distance on LCD
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Distance: ");
+    lcd.print(distance);
+    lcd.print(" cm");
+
+    // Set alerts based on distance
+    if (distance > 100) {
+        digitalWrite(greenLED, HIGH);
+        digitalWrite(yellowLED, LOW);
+        digitalWrite(redLED, LOW);
+        digitalWrite(buzzer, LOW);
+    } 
+    else if (distance <= 100 && distance > 50) {
+        digitalWrite(greenLED, LOW);
+        digitalWrite(yellowLED, HIGH);
+        digitalWrite(redLED, LOW);
+        digitalWrite(buzzer, LOW);
+    } 
+    else if (distance <= 50 && distance > 0) {
+        digitalWrite(greenLED, LOW);
+        digitalWrite(yellowLED, LOW);
+        digitalWrite(redLED, HIGH);
+        digitalWrite(buzzer, HIGH);
+    } 
+    else {
+        digitalWrite(greenLED, LOW);
+        digitalWrite(yellowLED, LOW);
+        digitalWrite(redLED, LOW);
+        digitalWrite(buzzer, LOW);
+    }
+
+    delay(500);
+}
